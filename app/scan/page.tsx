@@ -323,7 +323,7 @@ export default function ScanPage() {
         {/* Page title */}
         <div className="page-header">
           <h1 className="page-title">CT Scan Detection</h1>
-          <p className="page-subtitle">Upload CT scan images to detect lung nodules using YOLOv8 AI model.</p>
+          <p className="page-subtitle">Upload CT scan images to detect lung nodules using AI model.</p>
         </div>
 
         {/* Mode Tabs */}

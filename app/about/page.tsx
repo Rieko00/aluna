@@ -9,7 +9,7 @@ export default function AboutPage() {
           <div className="section-tag">About</div>
           <h1 className="section-title">About ALUNA</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', lineHeight: 1.8, marginBottom: '2rem' }}>
-            <strong style={{ color: 'var(--text-primary)' }}>ALUNA</strong> (Automated Lung Nodule Analyser) is a research-grade web application for detecting and classifying pulmonary nodules in CT scans using a custom-trained YOLOv8 model exported to ONNX format.
+            <strong style={{ color: 'var(--text-primary)' }}>ALUNA</strong> (AI Lung Analyzer) is a research-grade web application for detecting and classifying pulmonary nodules in CT scans using a custom-trained YOLOv8 model exported to ONNX format.
           </p>
 
           <div className="features-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>

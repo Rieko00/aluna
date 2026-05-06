@@ -51,7 +51,7 @@ const classes = [
 
 const steps = [
   { num: '01', title: 'Upload', desc: 'Drag & drop your CT scan (DICOM, PNG, JPG or BMP).' },
-  { num: '02', title: 'Detect', desc: 'Hit "Run Detection" — the YOLOv8 model infers in seconds.' },
+  { num: '02', title: 'Detect', desc: 'Hit "Run Detection" and the model infers in seconds.' },
   { num: '03', title: 'Review', desc: 'Inspect annotated results with bounding boxes and confidence scores.' },
 ];
 
@@ -63,10 +63,6 @@ export default function HomePage() {
       <section className="hero-section">
         <div className="hero-glow" aria-hidden="true" />
         <div className="hero-inner">
-          <div className="hero-badge">
-            <span className="status-dot" />
-            Powered by YOLOv8 · ONNX Runtime
-          </div>
 
           <h1 className="hero-title">
             AI-Powered<br />
@@ -76,16 +72,16 @@ export default function HomePage() {
 
           <p className="hero-desc">
             ALUNA leverages state-of-the-art deep learning to detect and classify lung nodules
-            from CT scans with high accuracy — supporting DICOM, PNG, JPG and BMP formats.
+            from CT scans with high accuracy supporting DICOM, PNG, JPG and BMP formats.
           </p>
 
           <div className="hero-actions">
-            <Link href="/scan" className="btn-primary hero-cta" id="hero-scan-btn">
+            <Link href="/scan" className="btn-primary hero-cta no-underline" id="hero-scan-btn">
               <Scan size={18} /> Start Scanning
               <ArrowRight size={16} />
             </Link>
-            <Link href="/about" className="btn-secondary" id="hero-about-btn">
-              Learn More
+            <Link href="/about" className="btn-secondary no-underline" id="hero-about-btn">
+              Download app
             </Link>
           </div>
 
@@ -93,7 +89,6 @@ export default function HomePage() {
             {[
               { value: '3', label: 'Detection Classes' },
               { value: 'LIDC', label: 'Training Dataset' },
-              { value: 'ONNX', label: 'Runtime Format' },
               { value: 'DCM', label: 'DICOM Support' },
             ].map(({ value, label }) => (
               <div key={label} className="hero-stat">
@@ -164,8 +159,8 @@ export default function HomePage() {
         <div className="cta-inner">
           <Activity size={40} style={{ color: 'var(--accent-bright)', marginBottom: '1rem' }} />
           <h2 className="cta-title">Ready to analyse your scans?</h2>
-          <p className="cta-desc">Upload your CT images now — no registration required. Supports DICOM and standard formats.</p>
-          <Link href="/scan" className="btn-primary" id="cta-scan-btn" style={{ fontSize: '1rem', padding: '14px 36px' }}>
+          <p className="cta-desc">Supports DICOM and standard formats.</p>
+          <Link href="/scan" className="btn-primary no-underline" id="cta-scan-btn" style={{ fontSize: '1rem', padding: '14px 36px' }}>
             <Scan size={18} /> Launch Scanner
           </Link>
         </div>
