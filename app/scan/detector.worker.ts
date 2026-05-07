@@ -222,8 +222,8 @@ function postprocess(
 }
 
 // ─── Message handler ──────────────────────────────────────────
-self.addEventListener('message', async (event: MessageEvent<{ file: File; conf: number }>) => {
-  const { file, conf } = event.data;
+self.addEventListener('message', async (event: MessageEvent<{ id: string; file: File; conf: number }>) => {
+  const { id, file, conf } = event.data;
   try {
     const { tensorData, origWidth, origHeight, dicomBase64 } = await preprocessFile(file);
 
@@ -235,8 +235,8 @@ self.addEventListener('message', async (event: MessageEvent<{ file: File; conf: 
     const outputTensor = results[session.outputNames[0]];
     const detections = postprocess(outputTensor, conf, origWidth, origHeight);
 
-    self.postMessage({ detections, origWidth, origHeight, dicomBase64 });
+    self.postMessage({ id, detections, origWidth, origHeight, dicomBase64 });
   } catch (err) {
-    self.postMessage({ error: err instanceof Error ? err.message : String(err) });
+    self.postMessage({ id, error: err instanceof Error ? err.message : String(err) });
   }
 });

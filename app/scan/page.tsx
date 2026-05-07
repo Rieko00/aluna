@@ -155,6 +155,38 @@ export default function ScanPage() {
   const [modalImg, setModalImg] = useState<{ url: string; name: string } | null>(null);
   const [isExporting, setIsExporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // ─── Worker singleton: created once, reused for all inferences ─
+  // The worker caches the ONNX session internally, so the model is
+  // only downloaded once per page visit.
+  const workerRef = useRef<Worker | null>(null);
+  const pendingRef = useRef<Map<string, {
+    resolve: (v: { detections: Detection[]; origWidth: number; origHeight: number; dicomBase64?: string }) => void;
+    reject: (e: Error) => void;
+  }>>(new Map());
+
+  useEffect(() => {
+    const worker = new Worker(
+      new URL('./detector.worker.ts', import.meta.url),
+      { type: 'module' },
+    );
+    worker.onmessage = (e: MessageEvent<{ id: string; detections?: Detection[]; origWidth?: number; origHeight?: number; dicomBase64?: string; error?: string }>) => {
+      const pending = pendingRef.current.get(e.data.id);
+      if (!pending) return;
+      pendingRef.current.delete(e.data.id);
+      if (e.data.error) pending.reject(new Error(e.data.error));
+      else pending.resolve(e.data as { detections: Detection[]; origWidth: number; origHeight: number; dicomBase64?: string });
+    };
+    worker.onerror = (e) => {
+      // Reject all pending requests on fatal worker error
+      pendingRef.current.forEach(({ reject }) => reject(new Error(e.message)));
+      pendingRef.current.clear();
+    };
+    workerRef.current = worker;
+    return () => {
+      worker.terminate();
+      workerRef.current = null;
+    };
+  }, []);
 
   const handleExportPdf = async () => {
     const done = files.filter((f) => f.status === 'done');
@@ -253,7 +285,7 @@ export default function ScanPage() {
 
   const runDetection = async () => {
     const pending = files.filter((f) => f.status === 'pending' || f.status === 'error');
-    if (!pending.length) return;
+    if (!pending.length || !workerRef.current) return;
     setIsRunning(true);
     setProgress(0);
 
@@ -268,20 +300,8 @@ export default function ScanPage() {
           origHeight: number;
           dicomBase64?: string;
         }>((resolve, reject) => {
-          const worker = new Worker(
-            new URL('./detector.worker.ts', import.meta.url),
-            { type: 'module' },
-          );
-          worker.onmessage = (e) => {
-            worker.terminate();
-            if (e.data.error) reject(new Error(e.data.error));
-            else resolve(e.data);
-          };
-          worker.onerror = (e) => {
-            worker.terminate();
-            reject(new Error(e.message));
-          };
-          worker.postMessage({ file: item.file, conf: confidence });
+          pendingRef.current.set(item.id, { resolve, reject });
+          workerRef.current!.postMessage({ id: item.id, file: item.file, conf: confidence });
         });
 
         const { detections, origWidth, origHeight, dicomBase64 } = result;
