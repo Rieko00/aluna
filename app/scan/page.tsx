@@ -262,20 +262,29 @@ export default function ScanPage() {
       setFiles((prev) => prev.map((f) => f.id === item.id ? { ...f, status: 'processing' } : f));
 
       try {
-        const fd = new FormData();
-        fd.append('file', item.file);
-        fd.append('conf', String(confidence));
-        const res = await fetch('/api/detect', { method: 'POST', body: fd });
-        const json = await res.json();
-
-        if (!res.ok || json.error) throw new Error(json.error ?? 'Inference failed');
-
-        const { detections, origWidth, origHeight, dicomBase64 } = json as {
+        const result = await new Promise<{
           detections: Detection[];
           origWidth: number;
           origHeight: number;
           dicomBase64?: string;
-        };
+        }>((resolve, reject) => {
+          const worker = new Worker(
+            new URL('./detector.worker.ts', import.meta.url),
+            { type: 'module' },
+          );
+          worker.onmessage = (e) => {
+            worker.terminate();
+            if (e.data.error) reject(new Error(e.data.error));
+            else resolve(e.data);
+          };
+          worker.onerror = (e) => {
+            worker.terminate();
+            reject(new Error(e.message));
+          };
+          worker.postMessage({ file: item.file, conf: confidence });
+        });
+
+        const { detections, origWidth, origHeight, dicomBase64 } = result;
 
         let annotatedUrl: string | undefined;
         const sourceUrl = dicomBase64 || item.imageUrl;
@@ -294,8 +303,8 @@ export default function ScanPage() {
           prev.map((f) =>
             f.id === item.id
               ? { ...f, status: 'done', detections, origWidth, origHeight, annotatedUrl }
-              : f
-          )
+              : f,
+          ),
         );
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
