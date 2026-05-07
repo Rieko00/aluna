@@ -80,7 +80,7 @@ export default function HomePage() {
               <Scan size={18} /> Start Scanning
               <ArrowRight size={16} />
             </Link>
-            <Link href="/about" className="btn-secondary no-underline" id="hero-about-btn">
+            <Link href="/download" className="btn-secondary no-underline" id="hero-about-btn">
               Download app
             </Link>
           </div>
