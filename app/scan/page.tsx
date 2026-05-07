@@ -149,7 +149,7 @@ export default function ScanPage() {
   const [mode, setMode] = useState<Mode>('single');
   const [files, setFiles] = useState<FileResult[]>([]);
   const [dragOver, setDragOver] = useState(false);
-  const [confidence, setConfidence] = useState(0.25);
+  const [confidence, setConfidence] = useState(0.5);
   const [isRunning, setIsRunning] = useState(false);
   const [progress, setProgress] = useState(0);
   const [modalImg, setModalImg] = useState<{ url: string; name: string } | null>(null);
