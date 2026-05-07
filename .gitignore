@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# model binary (too large for git, served from GitHub Releases in production)
+/public/models/

@@ -11,7 +11,14 @@ import dicomParser from 'dicom-parser';
 // ─── WASM path – served from /public ──────────────────────────
 ort.env.wasm.wasmPaths = '/';
 
-const MODEL_URL = '/models/best.onnx';
+// Model URL:
+//   - Development : file served from /public/models/ (local)
+//   - Production  : CDN URL (Vercel Blob / Cloudflare R2)
+//   Set NEXT_PUBLIC_MODEL_URL in Vercel Environment Variables
+const MODEL_URL =
+  (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_MODEL_URL)
+    ? process.env.NEXT_PUBLIC_MODEL_URL
+    : '/models/best.onnx';
 const INPUT_SIZE = 640;
 const CLASS_NAMES = ['benign', 'equivocal', 'malignant'];
 
