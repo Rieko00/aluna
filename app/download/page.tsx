@@ -22,7 +22,7 @@ export default function DownloadPage() {
 
               <div className="download-links">
                 <a href="https://github.com/Rieko00/aluna/releases/download/pre-release/Aluna.v1.0.0.msix" className="btn-primary download-btn">
-                  <Download size={16} /> Windows (.exe)
+                  <Download size={16} /> Windows (.msix)
                 </a>
                 <a href="#" style={{ opacity: 0.5, cursor: 'not-allowed' }} className="btn-secondary download-btn">
                   <Download size={16} /> macOS (.dmg)
