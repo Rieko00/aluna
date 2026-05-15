@@ -30,9 +30,36 @@ const DICOM_WIN_MAX = DICOM_WC + DICOM_WW / 2; //  150
 
 let sessionCache: ort.InferenceSession | null = null;
 
+// Menggunakan Cache API untuk menyimpan model di browser
+async function fetchModelWithCache(url: string): Promise<ArrayBuffer> {
+  try {
+    const cacheName = 'aluna-model-cache-v1';
+    const cache = await caches.open(cacheName);
+    let response = await cache.match(url);
+    
+    if (!response) {
+      console.log('Mendownload model dari:', url);
+      response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Gagal mendownload model: ${response.statusText}`);
+      }
+      // Simpan clone response ke cache
+      await cache.put(url, response.clone());
+    } else {
+      console.log('Model berhasil dimuat dari cache browser!');
+    }
+    return await response.arrayBuffer();
+  } catch (err) {
+    console.warn('Gagal menggunakan Cache API, fallback ke fetch langsung:', err);
+    const res = await fetch(url);
+    return await res.arrayBuffer();
+  }
+}
+
 async function getSession(): Promise<ort.InferenceSession> {
   if (!sessionCache) {
-    sessionCache = await ort.InferenceSession.create(MODEL_URL, {
+    const modelBuffer = await fetchModelWithCache(MODEL_URL);
+    sessionCache = await ort.InferenceSession.create(modelBuffer, {
       executionProviders: ['wasm'],
     });
   }
